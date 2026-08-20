@@ -54,7 +54,7 @@ func (s *Service) CreateOrder(ctx context.Context, principal Principal, input Cr
 		return FosterOrder{}, fmt.Errorf("%w: room is unavailable", ErrConflict)
 	}
 	var overlapping int
-	err = tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM foster_orders WHERE room_id=? AND status IN ('IN_PROGRESS') AND start_time < ? AND end_time > ?`, input.RoomID, formatStoredTime(input.EndTime), formatStoredTime(input.StartTime)).Scan(&overlapping)
+	err = tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM foster_orders WHERE room_id=? AND status IN ('PENDING','CONFIRMED','IN_PROGRESS') AND start_time < ? AND end_time > ?`, input.RoomID, formatStoredTime(input.EndTime), formatStoredTime(input.StartTime)).Scan(&overlapping)
 	if err != nil {
 		return FosterOrder{}, err
 	}

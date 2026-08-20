@@ -153,7 +153,7 @@ func (s *Service) ListRooms(ctx context.Context, principal Principal, pageNum, p
 	if err := s.store.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM rooms WHERE "+clause, args...).Scan(&total); err != nil {
 		return Page[Room]{}, err
 	}
-	rows, err := s.store.db.QueryContext(ctx, "SELECT r.room_id,r.room_number,r.room_type,r.status,r.price_per_day,COALESCE(r.description,''),r.capacity,(SELECT COUNT(*) FROM foster_orders o WHERE o.room_id=r.room_id AND o.status IN ('IN_PROGRESS')),r.create_time,r.update_time FROM rooms r WHERE "+clause+" ORDER BY r.room_id DESC LIMIT ? OFFSET ?", append(args, pageSize, (pageNum-1)*pageSize)...)
+	rows, err := s.store.db.QueryContext(ctx, "SELECT r.room_id,r.room_number,r.room_type,r.status,r.price_per_day,COALESCE(r.description,''),r.capacity,(SELECT COUNT(*) FROM foster_orders o WHERE o.room_id=r.room_id AND o.status IN ('PENDING','CONFIRMED','IN_PROGRESS')),r.create_time,r.update_time FROM rooms r WHERE "+clause+" ORDER BY r.room_id DESC LIMIT ? OFFSET ?", append(args, pageSize, (pageNum-1)*pageSize)...)
 	if err != nil {
 		return Page[Room]{}, err
 	}

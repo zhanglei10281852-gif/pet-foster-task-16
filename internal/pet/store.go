@@ -78,9 +78,9 @@ func (s *Store) migrate(ctx context.Context) error {
 		`CREATE INDEX IF NOT EXISTS idx_order_time ON foster_orders(start_time, end_time)`,
 		`CREATE INDEX IF NOT EXISTS idx_record_order_date ON daily_records(order_id, record_date)`,
 		`CREATE TRIGGER IF NOT EXISTS prevent_room_overcapacity BEFORE INSERT ON foster_orders
-		WHEN NEW.status IN ('IN_PROGRESS') AND
+		WHEN NEW.status IN ('PENDING','CONFIRMED','IN_PROGRESS') AND
 			(SELECT COUNT(*) FROM foster_orders o
-			 WHERE o.room_id=NEW.room_id AND o.status IN ('IN_PROGRESS')
+			 WHERE o.room_id=NEW.room_id AND o.status IN ('PENDING','CONFIRMED','IN_PROGRESS')
 			 AND o.start_time < NEW.end_time AND o.end_time > NEW.start_time) >=
 			COALESCE((SELECT capacity FROM rooms WHERE room_id=NEW.room_id),0)
 		BEGIN SELECT RAISE(ABORT, 'room capacity reached'); END`,
